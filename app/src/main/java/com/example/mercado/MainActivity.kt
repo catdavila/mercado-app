@@ -42,6 +42,7 @@ data class ItemCarrinho(
 
 //mutableStateListOf é uma lista especial do Compose que, quando alterada, avisa automaticamente as telas para se atualizarem (recomposição)
 val listaCarrinho = mutableStateListOf<ItemCarrinho>()
+var nomeUsuario by mutableStateOf("")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
 fun SupermercadoApp() {
     //Controla qual aba da parte inferior está selecionada (0: Início, 1: Carrinho, 2: Perfil)
     var selectedTab by remember { mutableStateOf(0) }
+    var usuarioLogado by remember { mutableStateOf(false) }
     //Scaffold é o esqueleto da tela, facilitando a colocação da barra inferior
     Scaffold(
         bottomBar = {
@@ -98,7 +100,11 @@ fun SupermercadoApp() {
             when (selectedTab) {
                 0 -> HomeScreen()
                 1 -> CarrinhoScreen()
-                2 -> PerfilScreen(onLoginSuccess = { selectedTab = 2 })
+                2 -> PerfilScreen(
+                    logado = usuarioLogado,
+                    onLoginSuccess = { usuarioLogado = true; selectedTab = 2 },
+                    onLogout = { usuarioLogado = false }
+                )
             }
         }
     }
@@ -170,7 +176,12 @@ fun HeaderSection(valorBusca: String, onBuscaChange: (String) -> Unit) {
             .padding(16.dp)
     ) {
         Column {
-            Text("Olá, Catarina 👋", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = if (nomeUsuario.isBlank()) "Olá 👋" else "Olá, $nomeUsuario 👋",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
             Text("Sua compra de mercado com facilidade", color = Color.White)
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
@@ -394,10 +405,9 @@ fun MenuItem(icone: ImageVector, titulo: String, corIcone: Color, onClick: () ->
 }
 
 @Composable
-fun PerfilScreen(onLoginSuccess: () -> Unit) {
+fun PerfilScreen(logado: Boolean, onLoginSuccess: () -> Unit, onLogout: () -> Unit) {
     //Gerencia se o usuário está vendo o menu de login ou sua conta logada
     var tela by remember { mutableStateOf("menu") }
-    var logado by remember { mutableStateOf(false) }
     if (logado) {
         //Layout da conta do usuário logado
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -411,7 +421,7 @@ fun PerfilScreen(onLoginSuccess: () -> Unit) {
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text("Catarina", fontWeight = FontWeight.Bold)
+                        Text(nomeUsuario, fontWeight = FontWeight.Bold)
                         Text("Cliente", color = Color.Gray)
                     }
                 }
@@ -428,7 +438,7 @@ fun PerfilScreen(onLoginSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { logado = false },
+                onClick = { onLogout() },
                 modifier = Modifier.fillMaxWidth(),
                 //colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
             ) {
@@ -448,7 +458,7 @@ fun PerfilScreen(onLoginSuccess: () -> Unit) {
                 OutlinedButton(onClick = { tela = "cadastro" }, Modifier.fillMaxWidth()) { Text("Criar Conta") }
             }
         }
-        "login" -> LoginScreen(onBack = { tela = "menu" }, onLoginSuccess = { logado = true; onLoginSuccess() })
+        "login" -> LoginScreen(onBack = { tela = "menu" }, onLoginSuccess = { onLoginSuccess() })
         "cadastro" -> CadastroScreen(onBack = { tela = "menu" })
     }
 }
@@ -472,6 +482,7 @@ fun LoginScreen(onBack: () -> Unit, onLoginSuccess: () -> Unit) {
         Button(onClick = {
             //Verificação simples de credenciais (Teste estático)
             if (email == "teste@teste.com" && senha == "1234") {
+                nomeUsuario = email.substringBefore("@")
                 onLoginSuccess()
             } else {
                 erroLogin = true
@@ -496,7 +507,9 @@ fun CadastroScreen(onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(value = senha, onValueChange = { senha = it }, label = { Text("Senha") }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { }, modifier = Modifier.fillMaxWidth()) { Text("Cadastrar") }
+        Button(onClick = {
+            nomeUsuario = nome
+        }, modifier = Modifier.fillMaxWidth()) { Text("Cadastrar") }
         TextButton(onClick = onBack) { Text("Voltar") }
     }
 }
