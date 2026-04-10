@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // MercadoTheme aplica o estilo visual (cores, tipografia) definido no projeto
+            //MercadoTheme aplica o estilo visual (cores, tipografia) definido no projeto
             MercadoTheme {
                 SupermercadoApp()
             }
@@ -417,7 +417,7 @@ fun PerfilScreen(logado: Boolean, onLoginSuccess: () -> Unit, onLogout: () -> Un
             Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(4.dp)) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = Modifier.size(60.dp).background(Color.LightGray), contentAlignment = Alignment.Center) {
-                        Text("C", fontSize = 24.sp)
+                        Text("t", fontSize = 24.sp)
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
