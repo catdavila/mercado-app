@@ -440,7 +440,6 @@ fun PerfilScreen(logado: Boolean, onLoginSuccess: () -> Unit, onLogout: () -> Un
             Button(
                 onClick = { onLogout() },
                 modifier = Modifier.fillMaxWidth(),
-                //colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
